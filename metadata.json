@@ -1,0 +1,5 @@
+{
+  "name": "ADHD 测评工具",
+  "description": "提供成人版和儿童版 ADHD (多动症) 专业测评量表，帮助用户进行初步自我筛查。",
+  "requestFramePermissions": []
+}

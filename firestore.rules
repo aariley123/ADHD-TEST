@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: redemptionCodes
+    // Document ID: {code}
+    // Fields:
+    //   - code: string (required)
+    //   - isUsed: boolean (required)
+    //   - usedBy: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "wieslaw1711@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.usedBy;
+    }
+
+    function isValidRedemptionUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isUsed', 'usedBy']) &&
+             !resource.data.isUsed &&
+             request.resource.data.isUsed == true &&
+             request.resource.data.usedBy == request.auth.uid;
+    }
+
+    match /redemptionCodes/{codeId} {
+      // Allow anyone (even anonymous) to check a code if they have the ID
+      allow get: if isAuthenticated();
+      
+      // Allow an authenticated user to claim an unused code
+      allow update: if isAuthenticated() && isValidRedemptionUpdate();
+      
+      // Admin can do everything
+      allow create, list, delete: if isAdmin();
+    }
+    
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+  }
+}

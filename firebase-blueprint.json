@@ -1,0 +1,35 @@
+{
+  "entities": {
+    "RedemptionCode": {
+      "title": "RedemptionCode",
+      "description": "A code used to grant access to the ADHD assessment tool.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "The unique redemption code."
+        },
+        "isUsed": {
+          "type": "boolean",
+          "description": "Whether the code has been used."
+        },
+        "usedBy": {
+          "type": "string",
+          "description": "The UID of the user who used this code."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the code was created."
+        }
+      },
+      "required": ["code", "isUsed", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/redemptionCodes/{codeId}": {
+      "schema": "RedemptionCode",
+      "description": "Collection of redemption codes."
+    }
+  }
+}
